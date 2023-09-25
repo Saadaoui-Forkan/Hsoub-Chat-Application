@@ -1,9 +1,7 @@
 import Chat from './Chat';
 import NotFound from './NotFound';
+import Register from './Register';
 
-/**
- * Export views.
- */
 export {
-    Chat, NotFound
+    Chat, NotFound, Register
 }

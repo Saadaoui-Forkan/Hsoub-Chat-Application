@@ -38,6 +38,23 @@ const ModelSchema = new mongoose.Schema({
     avatar: String,
 });
 
+ModelSchema.methods.getData = function(){
+    return {
+        id: this._id,
+        name: this.name,
+        username: this.username,
+        about: this.about,
+        avatar: this.avatar
+    };
+};
+
+//Generate user token with profile data.
+ModelSchema.methods.signJwt = function(){
+    let data = this.getData();
+    data.token = jwt.sign(data, process.env.JWT_SECRET);
+    return data;
+};
+
 ModelSchema.virtual('id').get(function(){
     return this._id.toHexString();
 });

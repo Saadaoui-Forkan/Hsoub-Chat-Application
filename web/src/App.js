@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
-import { Chat, NotFound } from 'views';
+import { Chat, NotFound, Register } from './views/index';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 class App extends Component {
 
     render() {
         return (
             <div id="main-container" className="container-fluid">
-            <Router>
-                <Switch>
-                    <AppRoute path='/' exact component={Chat}/>
-                    <AppRoute component={NotFound} />
-                </Switch>
-               </Router>
-        </div>
+                <Router>
+                    <Switch>
+                        <Route path='/' exact component={Chat}/>
+                        <Route path='/register' component={Register}/>
+                        <Route component={NotFound} />
+                    </Switch>
+                </Router>
+            </div>
         );
     }
 }
