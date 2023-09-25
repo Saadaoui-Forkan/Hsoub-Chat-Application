@@ -5,7 +5,7 @@ const createError = require('http-errors');
 //Register.
 exports.register = (req, res, next) => {
     // Get name, username and password from request.
-    let data = { username, password } = req.body;
+    let data = { name, username, password } = req.body;
     // Check if username already exist.
     User.findOne({username})
     .then(user => {

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import { Card, Form, Input, Button } from 'reactstrap';
 import Error from '../components/Error';
+import Auth from '../Auth';
+import axios from 'axios';
 
 export default class Register extends Component {
     state = {name: '', username: '', password: '', error: ''}
@@ -10,7 +12,19 @@ export default class Register extends Component {
         [e.target.name]: e.target.value, error: null
     })
 
-    onSubmit = e => {};
+    onSubmit = e => {
+      e.preventDefault();
+        let data = {
+            name: this.state.name, username: this.state.username, password: this.state.password
+        };
+        axios.post('/api/auth/register', data).then(res => {
+            Auth.login(res.data);
+            this.props.history.push('/');
+        })
+        .catch(err => {
+            this.setState({error: err.response.data.message});
+        });
+    };
   render() {
     return (
         <Card className="auth col-lg-3 col-sm-6">
