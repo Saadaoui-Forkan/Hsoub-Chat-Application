@@ -1,20 +1,7 @@
-/**
- * Mongoose Module.
- */
 const mongoose = require('mongoose');
-/**
- * JsonWebToken Module.
- */
 const jwt = require('jsonwebtoken');
-
-/**
- * Bcrypt Module.
- */
 const bcrypt = require('bcrypt');
 
-/**
- * Define User Schema.
- */
 const ModelSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -38,6 +25,14 @@ const ModelSchema = new mongoose.Schema({
     avatar: String,
 });
 
+// Hash Password
+ModelSchema.pre('save', function(next){
+    if(this.isNew || this.isModified('password')){
+        this.password = bcrypt.hashSync(this.password, 8);
+    }
+    next();
+});
+
 ModelSchema.methods.getData = function(){
     return {
         id: this._id,
@@ -58,6 +53,11 @@ ModelSchema.methods.signJwt = function(){
 ModelSchema.virtual('id').get(function(){
     return this._id.toHexString();
 });
+
+// Verify Password
+ModelSchema.methods.checkPassword = function (password) {
+    return bcrypt.compareSync(password, this.password)
+}
 
 
 const Model = mongoose.model('User', ModelSchema);

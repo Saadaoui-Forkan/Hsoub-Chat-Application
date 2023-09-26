@@ -4,19 +4,16 @@ const createError = require('http-errors');
 
 //Register.
 exports.register = (req, res, next) => {
-    // Get name, username and password from request.
-    let data = { name, username, password } = req.body;
-    // Check if username already exist.
+    let data = { name, username, password } = req.body
+
     User.findOne({username})
     .then(user => {
-        // if username already exist then create error.
-        if(user) throw createError(422, "اسم المستخدم موجود مسبقاً");
-        // Create new user.
-        return User.create(data);
+        if(user) throw createError(422, "اسم المستخدم موجود مسبقاً")
+        return User.create(data)
     })
     .then(user => {
         // Generate user token.
-        res.json(user.signJwt());
+        res.json(user.signJwt())
         // Broadcast created user profile to users.
         sendNewUser(user);
     })
