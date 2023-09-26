@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
-import { Chat, NotFound, Register } from './views/index';
+import { Chat, NotFound, Register, Login } from './views/index';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import AppRoute from './AppRoute';
+import Auth from './Auth';
 
 class App extends Component {
 
     render() {
         return (
-            <div id="main-container" className="container-fluid">
+            <div>
                 <Router>
                     <Switch>
-                        <Route path='/' exact component={Chat}/>
-                        <Route path='/register' component={Register}/>
-                        <Route component={NotFound} />
+                        <AppRoute path='/' exact component={Chat} can={Auth.auth} redirect='/login' />                        <Route path='/register' component={Register}/>
+                        <AppRoute path='/register' component={Register} can={Auth.guest} redirect='/' />
+                        <AppRoute path='/Login' component={Login} can={Auth.guest} redirect='/' />
+                        <AppRoute component={NotFound} />
                     </Switch>
                 </Router>
             </div>

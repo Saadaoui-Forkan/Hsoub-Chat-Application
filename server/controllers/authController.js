@@ -1,7 +1,6 @@
 const User = require('../models/user');
 const createError = require('http-errors');
 
-
 //Register.
 exports.register = (req, res, next) => {
     let data = { name, username, password } = req.body
@@ -20,3 +19,16 @@ exports.register = (req, res, next) => {
     .catch(next);
 };
 
+//Login
+exports.login = (req, res, next) => {
+    let { username, password } = req.body
+
+    User.findOne({username})
+    .then(user => {
+        if(!user || !user.checkPassword(password)) {            
+            throw createError(401, "يرجى التحقق من اسم المستخدم وكلمة المرور")
+        }        
+        res.json(user.signJwt())
+    })
+    .catch(next);
+};
