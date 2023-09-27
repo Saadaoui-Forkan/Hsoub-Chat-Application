@@ -18,7 +18,12 @@ const Auth = {
     logout: () => {
         delete axios.defaults.headers.common['Authorization']
         localStorage.removeItem('user')
-    }
+    },
+
+    getToken: () => {
+        let user = JSON.parse(localStorage.getItem('user'));
+        return user !== null ? user.token : '';
+    },
 }
 
 export default Auth;

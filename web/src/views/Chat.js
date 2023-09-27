@@ -1,10 +1,11 @@
-import React, { Component } from 'react'
-import ContactHeader from '../components/chat/ContactHeader'
-import { Row, Spinner } from 'reactstrap';
+import React, { Component } from 'react';
+import ContactHeader from '../components/chat/ContactHeader';
 import Contacts from '../components/chat/Contacts';
 import ChatHeader from '../components/chat/ChatHeader';
 import Messages from '../components/chat/Messages';
 import MessageForm from '../components/chat/MessageForm';
+import Auth from '../Auth';
+import { Row, Spinner } from 'reactstrap';
 
 // Implementing socketIo Client
 import socketIO from 'socket.io-client'; 
@@ -35,6 +36,26 @@ export default class Chat extends Component {
   componentDidMount(){
       this.initSocketConnection();
   }
+
+  // Init Socket
+  initSocketConnection = () => {
+    let socket = socketIO(process.env.REACT__SOCKET, {
+        query: 'token=' + Auth.getToken(),
+    });
+
+    socket.on('connect', () => this.setState({connected: true}));
+
+    socket.on('disconnect', () => this.setState({connected: false}));
+
+    socket.on(
+      "error", (err) => {
+        if (err === "auth_error") {
+          Auth.logout();
+          this.props.history.push("/login");
+        }
+      })
+    
+};
 
   render() {
     if(!this.state.connected){
