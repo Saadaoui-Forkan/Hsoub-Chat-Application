@@ -13,6 +13,7 @@ const ChatHeader = props => {
     }
 
     const status = () => {
+        if(props.typing) return 'يكتب الآن';
         if(props.contact.status === true) return 'متصل الآن';
         if(props.contact.status) return moment(props.contact.status).fromNow();
     };

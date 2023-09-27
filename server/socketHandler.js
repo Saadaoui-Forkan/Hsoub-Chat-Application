@@ -8,6 +8,7 @@ io.use(auth.socket)
 io.on('connection', socket => {
     socket.join(socket.user.id)
     socket.on('message', data => onMessage(socket, data))
+    socket.on('typing', receiver => onTyping(socket, receiver))
     console.log('New Client'+ socket.id)
     initialData(socket)
 })
@@ -49,4 +50,10 @@ const initialData = (socket) => {
         socket.emit("data", user, contacts, messages);
       })
       .catch(() => socket.disconnect());
+};
+
+// Typing Message
+const onTyping = (socket, receiver) => {
+  let sender = socket.user.id;
+  socket.to(receiver).emit('typing', sender);
 };

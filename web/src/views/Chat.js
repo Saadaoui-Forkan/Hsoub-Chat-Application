@@ -11,7 +11,10 @@ import { Row, Spinner } from 'reactstrap';
 import socketIO from 'socket.io-client'; 
 
 export default class Chat extends Component {
-  state = {};
+  state = {
+    contacts: [],
+    contact: {}
+  };
 
   onChatNavigate = (contact) => {
     this.setState({ contact });
@@ -55,6 +58,15 @@ export default class Chat extends Component {
 
     socket.on('user_status', this.updateUsersState)
 
+    socket.on("typing", (sender) => {
+      if (this.state.contact.id !== sender) return;
+      this.setState({ typing: sender });
+      clearTimeout(this.state.timeout);
+      // hide writing status after 3s
+      const timeout = setTimeout(this.typingTimeout, 3000);
+      this.setState({ timeout });
+    });
+
     socket.on("error", (err) => {
       if (err === "auth_error") {
         Auth.logout();
@@ -71,6 +83,8 @@ export default class Chat extends Component {
     this.setState({ messages });
     this.state.socket.emit("message", message);
   };
+
+  sendType = () => this.state.socket.emit('typing', this.state.contact.id);
 
   //update users statuses
   updateUsersState = (users) => {
@@ -100,9 +114,15 @@ export default class Chat extends Component {
           />
         </div>
         <div id="messages-section" className="col-8 col-md-8">
-          <ChatHeader contact={this.state.contact} />
+          <ChatHeader 
+            contact={this.state.contact} 
+            typing={this.state.typing}
+          />
           {this.renderChat()}
-          <MessageForm sender={this.sendMessage} />
+          <MessageForm 
+            sender={this.sendMessage} 
+            sendType={this.sendType}  
+          />
         </div>
       </Row>
     );

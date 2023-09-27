@@ -5,6 +5,7 @@ import moment from "moment";
 class MessageForm extends React.Component {
   state = {
     message: "",
+    lastType: false,
   };
 
   onChange = (e) => this.setState({ message: e.target.value });
@@ -19,6 +20,17 @@ class MessageForm extends React.Component {
     this.setState({ message: " " });
   };
 
+  onKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      this.setState({ lastType: false });
+      this.onSend();
+      e.preventDefault();
+    } else if (!this.state.lastType || moment() - this.state.lastType > 2000) {
+      this.setState({ lastType: moment() });
+      this.props.sendType();
+    }
+  };
+
   render() {
     return (
       <div id="send-message">
@@ -28,6 +40,7 @@ class MessageForm extends React.Component {
           onChange={this.onChange}
           value={this.state.message}
           placeholder="اكتب رسالتك هنا"
+          onKeyDown={this.onKeyDown}
         />
         <i className="fa fa-send text-muted px-3 send" onClick={this.onSend} />
       </div>
