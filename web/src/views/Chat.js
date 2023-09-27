@@ -11,23 +11,7 @@ import { Row, Spinner } from 'reactstrap';
 import socketIO from 'socket.io-client'; 
 
 export default class Chat extends Component {
-  state = {
-    user: { id: "1", name: "عبدالله" },
-    message: [
-      { sender: "1", receiver: "2", content: "ككيف حالك" },
-      { sender: "1", receiver: "2", content: "ككيف حالك" },
-      { sender: "3", receiver: "1", content: "ككيف حالك" },
-      { sender: "1", receiver: "3", content: "ككيف حالك" },
-      { sender: "1", receiver: "2", content: "ككيف حالك" },
-      { sender: "3", receiver: "2", content: "ككيف حالك" },
-      { sender: "2", receiver: "1", content: "ككيف حالك" },
-    ],
-    contacts: [
-      { id: "2", name: "محمد" },
-      { id: "3", name: "أحمد" },
-    ]
-    , contact: { id: "3", name: "أحمد" },
-  }
+  state = {}
 
   onChatNavigate = contact => {
     this.setState({contact})   
@@ -47,6 +31,13 @@ export default class Chat extends Component {
 
     socket.on('disconnect', () => this.setState({connected: false}));
 
+    socket.on("data", (user, contacts, messages, users) => {
+      let contact = contacts[0] || {};
+      this.setState({ messages, contacts, user, contact }, () => {
+        this.updateUsersState(users);
+      });
+    });
+
     socket.on(
       "error", (err) => {
         if (err === "auth_error") {
@@ -58,7 +49,7 @@ export default class Chat extends Component {
 };
 
   render() {
-    if(!this.state.connected){
+    if(!this.state.connected || !this.state.contacts || !this.state.messages){
       return <Spinner id="loader" color="success" />
     }
 
