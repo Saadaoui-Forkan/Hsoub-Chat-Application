@@ -11,12 +11,15 @@ exports.register = (req, res, next) => {
         return User.create(data)
     })
     .then(user => {
-        // Generate user token.
         res.json(user.signJwt())
-        // Broadcast created user profile to users.
         sendNewUser(user);
     })
     .catch(next);
+};
+
+const sendNewUser = user => {
+    let data = { name, username, avatar } = user;
+    io.emit('new_user', data);
 };
 
 //Login
@@ -32,3 +35,5 @@ exports.login = (req, res, next) => {
     })
     .catch(next);
 };
+
+

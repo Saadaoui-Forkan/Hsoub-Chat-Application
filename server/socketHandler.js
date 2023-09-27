@@ -6,9 +6,21 @@ const User = require('./models/user');
 io.use(auth.socket)
 
 io.on('connection', socket => {
+    socket.join(socket.user.id)
+    socket.on('message', data => onMessage(socket, data))
     console.log('New Client'+ socket.id)
     initialData(socket)
 })
+
+const onMessage = (socket, data) => {
+    let sender = socket.user.id
+    let receiver = data.receiver
+    let message = {
+        sender: sender, receiver: receiver, content: data.content, date: new Date().getTime()
+    }
+    Message.create(message)
+    socket.to(receiver).to(sender).emit('message', message);
+};
 
 // Get all user messages.
 const getMessages = (userId) => {
