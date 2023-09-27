@@ -28,7 +28,7 @@ export default class Register extends Component {
   render() {
     return (
         <Card className="auth col-lg-3 col-sm-6">
-        <Form onSubmit={this.onSubmit}>
+        <Form onSubmit={this.onSubmit}>  
             <h5 className="mb-4">إنشاء حساب جديد</h5>
             <Error error={this.state.error}/>
             <Input value={this.state.name} name="name" onChange={this.onChange} placeholder="الاسم" required autoFocus />
