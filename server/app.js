@@ -6,6 +6,9 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const createError = require('http-errors')
 
+// Implementing SocketIo
+require('./socketHandler')
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 

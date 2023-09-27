@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
 import ContactHeader from '../components/chat/ContactHeader'
-import { Row } from 'reactstrap';
+import { Row, Spinner } from 'reactstrap';
 import Contacts from '../components/chat/Contacts';
 import ChatHeader from '../components/chat/ChatHeader';
 import Messages from '../components/chat/Messages';
 import MessageForm from '../components/chat/MessageForm';
+
+// Implementing socketIo Client
+import socketIO from 'socket.io-client'; 
 
 export default class Chat extends Component {
   state = {
@@ -26,9 +29,18 @@ export default class Chat extends Component {
   }
 
   onChatNavigate = contact => {
-    this.setState({contact})
-};
+    this.setState({contact})   
+  }
+
+  componentDidMount(){
+      this.initSocketConnection();
+  }
+
   render() {
+    if(!this.state.connected){
+      return <Spinner id="loader" color="success" />
+    }
+
     return (
       <Row className="h-100">
         <div id="contacts-section" className="col-4 col-md-4">
