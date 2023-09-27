@@ -31,10 +31,10 @@ export default class Chat extends Component {
 
     socket.on("disconnect", () => this.setState({ connected: false }));
 
-    socket.on("data", (user, contacts, messages) => {
+    socket.on("data", (user, contacts, messages, users) => {
       let contact = contacts[0] || {};
       this.setState({ messages, contacts, user, contact }, () => {
-        this.setState(messages, contacts, user, contact);
+        this.updateUsersState(users);
       });
     });
 
@@ -53,13 +53,15 @@ export default class Chat extends Component {
       this.setState({ messages });
     });
 
+    socket.on('user_status', this.updateUsersState)
+
     socket.on("error", (err) => {
       if (err === "auth_error") {
         Auth.logout();
         this.props.history.push("/login");
       }
     });
-    this.setState({socket})
+    this.setState({ socket });
   };
 
   sendMessage = (message) => {
@@ -68,6 +70,18 @@ export default class Chat extends Component {
     let messages = this.state.messages.concat(message);
     this.setState({ messages });
     this.state.socket.emit("message", message);
+  };
+
+  //update users statuses
+  updateUsersState = (users) => {
+    let contacts = this.state.contacts;
+    contacts.forEach((element, index) => {
+      if (users[element.id]) contacts[index].status = users[element.id];
+    });
+    this.setState({ contacts });
+    let contact = this.state.contact;
+    if (users[contact.id]) contact.status = users[contact.id];
+    this.setState({ contact });
   };
 
   render() {
@@ -88,9 +102,7 @@ export default class Chat extends Component {
         <div id="messages-section" className="col-8 col-md-8">
           <ChatHeader contact={this.state.contact} />
           {this.renderChat()}
-          <MessageForm 
-            sender={this.sendMessage}
-          />
+          <MessageForm sender={this.sendMessage} />
         </div>
       </Row>
     );

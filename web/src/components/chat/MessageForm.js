@@ -9,14 +9,14 @@ class MessageForm extends React.Component {
 
   onChange = (e) => this.setState({ message: e.target.value });
 
-  onSend = (e) => {
+  onSend = () => {
     if (!this.state.message) return;
     let message = {
       content: this.state.message,
       date: new Date().getTime(),
     };
     this.props.sender(message);
-    this.setState({ message: "" });
+    this.setState({ message: " " });
   };
 
   render() {
