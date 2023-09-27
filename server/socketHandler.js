@@ -34,7 +34,7 @@ const initialData = (socket) => {
         return getUsers(user.id);
       })
       .then((contacts) => {
-        socket.emit("data", user, contacts, messages, users);
+        socket.emit("data", user, contacts, messages);
       })
       .catch(() => socket.disconnect());
 };

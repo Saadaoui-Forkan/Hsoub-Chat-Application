@@ -24,27 +24,26 @@ export default class Chat extends Component {
   // Init Socket
   initSocketConnection = () => {
     let socket = socketIO(process.env.REACT__SOCKET, {
-        query: 'token=' + Auth.getToken(),
-    });
+        query: 'token =' + Auth.getToken(),
+    })
 
-    socket.on('connect', () => this.setState({connected: true}));
+    socket.on('connect', () => this.setState({connected: true}))
 
-    socket.on('disconnect', () => this.setState({connected: false}));
+    socket.on('disconnect', () => this.setState({connected: false}))
 
-    socket.on("data", (user, contacts, messages, users) => {
+    socket.on("data", (user, contacts, messages) => {
       let contact = contacts[0] || {};
       this.setState({ messages, contacts, user, contact }, () => {
-        this.updateUsersState(users);
-      });
-    });
-
-    socket.on(
-      "error", (err) => {
-        if (err === "auth_error") {
-          Auth.logout();
-          this.props.history.push("/login");
-        }
+        this.setState(messages, contacts, user, contact);
       })
+    })
+
+    socket.on( "error", (err) => {
+      if (err === "auth_error") {
+        Auth.logout();
+        this.props.history.push("/login");
+      }
+    })
     
 };
 
@@ -59,12 +58,14 @@ export default class Chat extends Component {
           <ContactHeader />
           <Contacts 
             contacts={this.state.contacts} 
-            messages={this.state.message}
+            messages={this.state.messages}
             onChatNavigate={this.onChatNavigate}
           />
         </div>
         <div id="messages-section" className="col-8 col-md-8">
-          <ChatHeader contact={this.state.contact} />
+          <ChatHeader 
+            contact={this.state.contact} 
+          />
 					{this.renderChat()}
 					<MessageForm />
         </div>
