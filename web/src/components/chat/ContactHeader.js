@@ -8,7 +8,9 @@ const ChatHeader = props => {
         <Row className="heading">
             <Avatar  />
             <div>جهات الإتصال</div>
-            
+            <div className="mr-auto nav-link" onClick={props.toggle}>
+                <i className="fa fa-bars" />
+            </div>
         </Row>
     );
 };

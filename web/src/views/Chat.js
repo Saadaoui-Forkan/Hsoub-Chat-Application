@@ -10,12 +10,14 @@ import { Row, Spinner } from 'reactstrap';
 // Implementing socketIo Client
 import socketIO from 'socket.io-client'; 
 import UserProfile from '../components/side/UserProfile';
+import EditProfile from '../components/side/EditProfile';
 
 export default class Chat extends Component {
   state = {
     contacts: [],
     contact: {},
     userProfile: false,
+    profile: false,
   };
 
   componentDidMount() {
@@ -50,6 +52,9 @@ export default class Chat extends Component {
     this.setState({userProfile: !this.state.userProfile})
   }
 
+  // Edit Profile
+  profileToggle = () => this.setState({profile: !this.state.profile})
+
   render() {
     if (!this.state.connected || !this.state.contacts || !this.state.messages) {
       return <Spinner id="loader" color="danger" />;
@@ -59,7 +64,10 @@ export default class Chat extends Component {
     return (
       <Row className="h-100">
         <div id="contacts-section" className="col-4 col-md-4">
-          <ContactHeader user={this.state.user} />
+          <ContactHeader 
+            user={this.state.user} 
+            toggle={this.profileToggle}  
+          />
           <Contacts
             contacts={this.state.contacts}
             messages={this.state.messages}
@@ -68,6 +76,11 @@ export default class Chat extends Component {
           <UserProfile
             contact={this.state.contact}
             toggle={this.userProfileToggle}
+          />
+          <EditProfile
+            user={this.state.contact}
+            toggle={this.profileToggle}
+            open={this.state.profile}
           />
         </div>
         <div id="messages-section" className="col-8 col-md-8">
@@ -112,6 +125,14 @@ export default class Chat extends Component {
     socket.on("new_user", (user) => {
       let contacts = this.state.contacts.concat(user);
       this.setState({ contacts });
+    });
+
+    socket.on("update_user", (user) => {
+      if (this.state.user.id === user.id) {
+        this.setState({ user });
+        Auth.setUser(user);
+        return;
+      }
     });
 
     socket.on("message", (message) => {
