@@ -9,11 +9,13 @@ import { Row, Spinner } from 'reactstrap';
 
 // Implementing socketIo Client
 import socketIO from 'socket.io-client'; 
+import UserProfile from '../components/side/UserProfile';
 
 export default class Chat extends Component {
   state = {
     contacts: [],
     contact: {},
+    userProfile: false,
   };
 
   componentDidMount() {
@@ -43,9 +45,14 @@ export default class Chat extends Component {
 
   // sendType = () => this.state.socket.emit("typing", this.state.contact.id);
 
+  //  Toggle Profile
+  userProfileToggle = () => {
+    this.setState({userProfile: !this.state.userProfile})
+  }
+
   render() {
     if (!this.state.connected || !this.state.contacts || !this.state.messages) {
-      return <Spinner id="loader" color="success" />;
+      return <Spinner id="loader" color="danger" />;
       // console.log("first");
     }
 
@@ -58,9 +65,17 @@ export default class Chat extends Component {
             messages={this.state.messages}
             onChatNavigate={this.onChatNavigate}
           />
+          <UserProfile
+            contact={this.state.contact}
+            toggle={this.userProfileToggle}
+          />
         </div>
         <div id="messages-section" className="col-8 col-md-8">
-          <ChatHeader contact={this.state.contact} typing={this.state.typing} />
+          <ChatHeader 
+            contact={this.state.contact} 
+            typing={this.state.typing} 
+            toggle={this.userProfileToggle}
+          />
           {this.renderChat()}
           <MessageForm sender={this.sendMessage} sendType={this.sendType} />
         </div>
