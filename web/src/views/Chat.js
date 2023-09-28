@@ -13,16 +13,69 @@ import socketIO from 'socket.io-client';
 export default class Chat extends Component {
   state = {
     contacts: [],
-    contact: {}
-  };
-
-  onChatNavigate = (contact) => {
-    this.setState({ contact });
+    contact: {},
   };
 
   componentDidMount() {
     this.initSocketConnection();
   }
+
+  // Navigation between chats
+  onChatNavigate = (contact) => {
+    this.setState({ contact });
+
+    this.state.socket.emit("seen", contact.id);
+
+    let messages = this.state.messages;
+    messages.forEach((element, index) => {
+      if (element.sender === contact.id) messages[index].seen = true;
+    });
+    this.setState({ messages });
+  };
+
+  // sendMessage = (message) => {
+  //   if (!this.state.contact.id) return;
+  //   message.receiver = this.state.contact.id;
+  //   let messages = this.state.messages.concat(message);
+  //   this.setState({ messages });
+  //   this.state.socket.emit("message", message);
+  // };
+
+  // sendType = () => this.state.socket.emit("typing", this.state.contact.id);
+
+  render() {
+    if (!this.state.connected || !this.state.contacts || !this.state.messages) {
+      return <Spinner id="loader" color="success" />;
+      // console.log("first");
+    }
+
+    return (
+      <Row className="h-100">
+        <div id="contacts-section" className="col-4 col-md-4">
+          <ContactHeader user={this.state.user} />
+          <Contacts
+            contacts={this.state.contacts}
+            messages={this.state.messages}
+            onChatNavigate={this.onChatNavigate}
+          />
+        </div>
+        <div id="messages-section" className="col-8 col-md-8">
+          <ChatHeader contact={this.state.contact} typing={this.state.typing} />
+          {this.renderChat()}
+          <MessageForm sender={this.sendMessage} sendType={this.sendType} />
+        </div>
+      </Row>
+    );
+  }
+
+  renderChat = () => {
+    const { contact, user } = this.state;
+    if (!contact) return;
+    let messages = this.state.message.filter(
+      (e) => e.sender === contact.id || e.receiver === contact.id
+    );
+    return <Messages user={user} messages={messages} />;
+  };
 
   // Init Socket
   initSocketConnection = () => {
@@ -56,7 +109,18 @@ export default class Chat extends Component {
       this.setState({ messages });
     });
 
-    socket.on('user_status', this.updateUsersState)
+    socket.on("user_status", (users) => {
+      let contacts = this.state.contacts;
+      contacts.forEach((element, index) => {
+        if (users[element.id]) contacts[index].status = users[element.id];
+      });
+      this.setState({ contacts });
+      let contact = this.state.contact;
+      if (users[contact.id]) {
+        contact.status = users[contact.id];
+      }
+      this.setState({ contact });
+    });
 
     socket.on("typing", (sender) => {
       if (this.state.contact.id !== sender) return;
@@ -76,6 +140,8 @@ export default class Chat extends Component {
     this.setState({ socket });
   };
 
+  typingTimeout = () => this.setState({ typing: false });
+
   sendMessage = (message) => {
     if (!this.state.contact.id) return;
     message.receiver = this.state.contact.id;
@@ -85,54 +151,4 @@ export default class Chat extends Component {
   };
 
   sendType = () => this.state.socket.emit('typing', this.state.contact.id);
-
-  //update users statuses
-  updateUsersState = (users) => {
-    let contacts = this.state.contacts;
-    contacts.forEach((element, index) => {
-      if (users[element.id]) contacts[index].status = users[element.id];
-    });
-    this.setState({ contacts });
-    let contact = this.state.contact;
-    if (users[contact.id]) contact.status = users[contact.id];
-    this.setState({ contact });
-  };
-
-  render() {
-    if (!this.state.connected || !this.state.contacts || !this.state.messages) {
-      return <Spinner id="loader" color="success" />;
-    }
-
-    return (
-      <Row className="h-100">
-        <div id="contacts-section" className="col-4 col-md-4">
-          <ContactHeader />
-          <Contacts
-            contacts={this.state.contacts}
-            messages={this.state.messages}
-            onChatNavigate={this.onChatNavigate}
-          />
-        </div>
-        <div id="messages-section" className="col-8 col-md-8">
-          <ChatHeader 
-            contact={this.state.contact} 
-            typing={this.state.typing}
-          />
-          {this.renderChat()}
-          <MessageForm 
-            sender={this.sendMessage} 
-            sendType={this.sendType}  
-          />
-        </div>
-      </Row>
-    );
-  }
-  renderChat = () => {
-    const { contact, user } = this.state;
-    if (!contact) return;
-    let messages = this.state.message.filter(
-      (e) => e.sender === contact.id || e.receiver === contact.id
-    );
-    return <Messages user={user} messages={messages} />;
-  };
 }

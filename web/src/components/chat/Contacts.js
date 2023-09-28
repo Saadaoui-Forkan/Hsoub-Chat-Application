@@ -30,7 +30,11 @@ class Contacts extends React.Component {
                 key={index}
                 onClick={this.props.onChatNavigate.bind(this, contact)}
             >
-               <Contact contact={contact} message={lastMessage}/>
+               <Contact 
+                contact={contact} 
+                message={lastMessage} 
+                unseen={unseen}
+               />
            </div>
        );
    }

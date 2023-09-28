@@ -3,15 +3,32 @@ const auth = require('./middlewares/auth')
 const Message = require('./models/message');
 const User = require('./models/user');
 
+const users = {}
+
 io.use(auth.socket)
 
 io.on('connection', socket => {
-    socket.join(socket.user.id)
+    onSocketConnected(socket);
     socket.on('message', data => onMessage(socket, data))
     socket.on('typing', receiver => onTyping(socket, receiver))
-    console.log('New Client'+ socket.id)
+    socket.on('seen', sender => onSeen(socket, sender));
+    // console.log('New Client'+ socket.id)
     initialData(socket)
+    socket.on('disconnect', () => onSocketDisconnected(socket));
 })
+
+// Connection Handling
+const onSocketConnected = (socket) => {
+  console.log("New client connected: " + socket.id);
+  socket.join(socket.user.id);
+  users[socket.user.id] = true;
+  let room = io.sockets.adapter.rooms[socket.user.id];
+  if (!room || room.length === 1) {
+    io.emit("user_status", {
+      [socket.user.id]: true,
+    });
+  }
+};
 
 const onMessage = (socket, data) => {
     let sender = socket.user.id
@@ -21,6 +38,23 @@ const onMessage = (socket, data) => {
     }
     Message.create(message)
     socket.to(receiver).to(sender).emit('message', message);
+};
+
+// Typing Message
+const onTyping = (socket, receiver) => {
+  let sender = socket.user.id;
+  socket.to(receiver).emit('typing', sender);
+};
+
+// Handle Message Seen Event
+const onSeen = (socket, sender) => {
+  let receiver = socket.user.id;
+  console.log({ sender, receiver, seen: false });
+  Message.updateMany(
+    { sender, receiver, seen: false },
+    { seen: true },
+    { multi: true }
+  ).exec();
 };
 
 // Get all user messages.
@@ -52,8 +86,15 @@ const initialData = (socket) => {
       .catch(() => socket.disconnect());
 };
 
-// Typing Message
-const onTyping = (socket, receiver) => {
-  let sender = socket.user.id;
-  socket.to(receiver).emit('typing', sender);
+// Disconnection Handling
+const onSocketDisconnected = socket => {
+  let room = io.sockets.adapter.rooms[socket.user.id];
+  if(!room || room.length < 1){
+      let lastSeen = new Date().getTime();
+      users[socket.user.id] = lastSeen;
+      io.emit('user_status', {
+          [socket.user.id]: lastSeen
+      });
+  }
+  console.log('Client disconnected: ' + socket.user.username);
 };

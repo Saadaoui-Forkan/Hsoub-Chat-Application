@@ -2,15 +2,9 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import Avatar from "../Avatar";
 import { Row, DropdownItem, DropdownMenu, DropdownToggle, Nav, UncontrolledDropdown} from "reactstrap";
-import Auth from "../../Auth";
 import moment from "moment"
 
 const ChatHeader = props => {
-
-    const logout = () => {
-        Auth.logout()
-        props.history.push('/')
-    }
 
     const status = () => {
         if(props.typing) return 'يكتب الآن';
@@ -33,7 +27,7 @@ const ChatHeader = props => {
                     <DropdownMenu>
                         <DropdownItem onClick={e => props.history.push('/password')}>تغيير كلمة المرور</DropdownItem>
                         <DropdownItem divider />
-                        <DropdownItem onClick={logout}>تسجيل الخروج</DropdownItem>
+                        <DropdownItem onClick={props.logout}>تسجيل الخروج</DropdownItem>
                     </DropdownMenu>
                 </UncontrolledDropdown>
             </Nav>

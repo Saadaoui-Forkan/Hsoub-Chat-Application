@@ -1,6 +1,7 @@
 import React from "react";
 import Avatar from "../Avatar";
 import moment from 'moment';
+import { Badge } from 'reactstrap';
 
 const Contact = props => (
    <div className="contact">
@@ -18,6 +19,7 @@ const Contact = props => (
            <div className="small text-muted">
                {props.message ? moment(props.message.date).format("hh:mm a") : ''}
            </div>
+           { props.unseen > 0 ? <Badge color="success">{props.unseen}</Badge> : ''}
        </div>
    </div>
 );
