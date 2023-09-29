@@ -1,29 +1,9 @@
-/**
- * Express Module.
- */
-const express = require('express');
-
-/**
- * Router Module.
- */
+const express = require("express");
 const router = express.Router();
+const controller = require("../controllers/authController");
 
-/**
- * Controller Module.
- */
-const controller = require('../controllers/authController');
+router.post("/", controller.login);
 
-/**
- * [POST] Login request.
- */
-router.post('/', controller.login);
+router.post("/register", controller.register);
 
-/**
- * [POST] Register request.
- */
-router.post('/register', controller.register);
-
-/**
- * Export router.
- */
 module.exports = router;

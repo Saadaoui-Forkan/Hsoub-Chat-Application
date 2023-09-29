@@ -8,9 +8,6 @@ import MessageForm from './chat/MessageForm';
 import UserProfile from './side/UserProfile';
 import EditProfile from './side/EditProfile';
 
-/**
- * Export Components.
- */
 export {
     Error, Avatar, ContactHeader, Contacts, ChatHeader, Messages, MessageForm, UserProfile, EditProfile
 }

@@ -1,63 +1,36 @@
 import axios from 'axios';
 
 const Auth = {
+  init: () => {
+    let user = JSON.parse(localStorage.getItem("user"));
+    axios.defaults.headers.common["Authorization"] =
+      user !== null ? user.token : "";
+  },
 
-    /**
-     * Initialize axios headers.
-     */
-    init: () => {
-        let user = JSON.parse(localStorage.getItem('user'));
-        axios.defaults.headers.common['Authorization'] = user !== null ? user.token : '';
-    },
+  login: (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+    axios.defaults.headers.common["Authorization"] = user.token;
+  },
 
-    /**
-     * Store user data after login.
-     * @param user
-     */
-    login: user => {
-        localStorage.setItem('user', JSON.stringify(user));
-        axios.defaults.headers.common['Authorization'] = user.token;
-    },
+  logout: () => {
+    delete axios.defaults.headers.common["Authorization"];
+    localStorage.removeItem("user");
+  },
 
-    /**
-     * Delete user data.
-     */
-    logout: () => {
-        delete axios.defaults.headers.common['Authorization'];
-        localStorage.removeItem('user');
-    },
+  auth: () => localStorage.getItem("user") !== null,
 
-    /**
-     * Is user authenticated.
-     * @returns {boolean}
-     */
-    auth: () => localStorage.getItem('user') !== null,
+  guest: () => localStorage.getItem("user") === null,
 
-    /**
-     * Is guest.
-     * @returns {boolean}
-     */
-    guest: () => localStorage.getItem('user') === null,
+  getToken: () => {
+    let user = JSON.parse(localStorage.getItem("user"));
+    return user !== null ? user.token : "";
+  },
 
-    /**
-     * Get user token.
-     * @returns {string}
-     */
-    getToken: () => {
-        let user = JSON.parse(localStorage.getItem('user'));
-        return user !== null ? user.token : '';
-    },
-
-    /**
-     * Set user
-     * @param newProfile
-     */
-    setUser: (newProfile) => {
-        let user = JSON.parse(localStorage.getItem('user'));
-        newProfile.token = user.token;
-        localStorage.setItem('user', JSON.stringify(newProfile));
-    },
-
+  setUser: (newProfile) => {
+    let user = JSON.parse(localStorage.getItem("user"));
+    newProfile.token = user.token;
+    localStorage.setItem("user", JSON.stringify(newProfile));
+  },
 };
 
 export default Auth;
