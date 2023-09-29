@@ -1,9 +1,13 @@
-import React, { Component } from 'react'
+import React from 'react';
 
-export default class NotFound extends Component {
-  render() {
+/**
+ * NotFound Component Page.
+ * @param props
+ */
+const NotFound = props => {
     return (
-      <div>NotFound</div>
-    )
-  }
-}
+        <h3>الصفحة المطلوبة غير موجودة</h3>
+    );
+};
+
+export default NotFound;

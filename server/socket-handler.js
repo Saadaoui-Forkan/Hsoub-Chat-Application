@@ -1,8 +1,23 @@
-io = require('socket.io')()
-const auth = require('./middlewares/auth')
+io = require('socket.io')();
+
+/**
+ * Authentication middleware.
+ */
+const auth = require('./middlewares/auth');
+
+/**
+ * Message Model.
+ */
 const Message = require('./models/message');
+
+/**
+ * User Mode.
+ */
 const User = require('./models/user');
 
+/**
+ * User statuses.
+ */
 const users = {};
 
 /**

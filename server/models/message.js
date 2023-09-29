@@ -1,6 +1,16 @@
+/**
+ * Mongoose Module.
+ */
 const mongoose = require('mongoose');
 
+/**
+ * Mongoose Schema
+ */
 const Schema = mongoose.Schema;
+
+/**
+ * Define Message Schema.
+ */
 const ModelSchema = new mongoose.Schema({
     sender: {
         type: Schema.Types.ObjectId,

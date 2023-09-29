@@ -1,4 +1,5 @@
 const User = require('../models/user');
+
 const createError = require('http-errors');
 
 exports.login = (req, res, next) => {
