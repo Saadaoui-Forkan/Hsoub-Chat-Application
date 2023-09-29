@@ -1,17 +1,36 @@
 const User = require('../models/user');
 const createError = require('http-errors');
 
-//Register.
-exports.register = (req, res, next) => {
-    let data = { name, username, password } = req.body
+exports.login = (req, res, next) => {
+    // Get username and password from request.
+    const { username, password } = req.body;
+    // Find user by username.
+    User.findOne({username}).then(user => {
+        // if user not found or password is wrong then create error.
+        if(!user || !user.checkPassword(password)){
+            throw createError(401, 'الرجاء التحقق من اسم المستخدم وكلمة المرور');
+        }
+        // Generate user token.
+        res.json(user.signJwt());
+    })
+    .catch(next);
+};
 
+exports.register = (req, res, next) => {
+    // Get name, username and password from request.
+    let data = { name, username, password } = req.body;
+    // Check if username already exist.
     User.findOne({username})
     .then(user => {
-        if(user) throw createError(422, "اسم المستخدم موجود مسبقاً")
-        return User.create(data)
+        // if username already exist then create error.
+        if(user) throw createError(422, "اسم المستخدم موجود مسبقاً");
+        // Create new user.
+        return User.create(data);
     })
     .then(user => {
-        res.json(user.signJwt())
+        // Generate user token.
+        res.json(user.signJwt());
+        // Broadcast created user profile to users.
         sendNewUser(user);
     })
     .catch(next);
@@ -21,19 +40,3 @@ const sendNewUser = user => {
     let data = { name, username, avatar } = user;
     io.emit('new_user', data);
 };
-
-//Login
-exports.login = (req, res, next) => {
-    let { username, password } = req.body
-
-    User.findOne({username})
-    .then(user => {
-        if(!user || !user.checkPassword(password)) {            
-            throw createError(401, "يرجى التحقق من اسم المستخدم وكلمة المرور")
-        }        
-        res.json(user.signJwt())
-    })
-    .catch(next);
-};
-
-

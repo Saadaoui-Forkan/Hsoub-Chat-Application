@@ -3,21 +3,18 @@ import { Input } from "reactstrap";
 import moment from "moment";
 
 class MessageForm extends React.Component {
-  state = {
-    message: "",
-    lastType: false,
-  };
+  state = { message: "", lastType: false };
 
   onChange = (e) => this.setState({ message: e.target.value });
 
-  onSend = () => {
+  onSend = (e) => {
     if (!this.state.message) return;
     let message = {
       content: this.state.message,
       date: new Date().getTime(),
     };
     this.props.sender(message);
-    this.setState({ message: " " });
+    this.setState({ message: "" });
   };
 
   onKeyDown = (e) => {
@@ -38,9 +35,9 @@ class MessageForm extends React.Component {
           type="textarea"
           rows="1"
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
           value={this.state.message}
           placeholder="اكتب رسالتك هنا"
-          onKeyDown={this.onKeyDown}
         />
         <i className="fa fa-send text-muted px-3 send" onClick={this.onSend} />
       </div>
